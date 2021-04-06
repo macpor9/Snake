@@ -1,0 +1,265 @@
+@startuml
+
+skinparam monochrome true
+skinparam linetype ortho
+skinparam shadowing false
+class Utills << (S,#FF7700) Singleton >>
+class ScreenDisplay << (S,#FF7700) Singleton >>
+
+
+class App extends JFrame implements KeyListener {
+    + App()
+
+    + keyTyped(KeyEvent e) : void
+    + keyPressed(KeyEvent e) : void
+    + keyReleased(KeyEvent e) : void
+}
+
+class Snake {
+    - body : ArrayList<SnakeElement>
+    - directory : Position
+
+    + Snake()
+
+    + getBody() : ArrayList<SnakeElement>
+    + Position : getDirectory()
+    + eat(Food food) : void
+    + removeLast() : void
+    + addBody() : void
+    + move() : void
+}
+
+class SnakeElement {
+    - texture : BufferedImage
+    - position : Position
+
+    + SnakeElement(Position position, BufferedImage texture)
+
+    + getTexture() : BufferedImage
+    + setTexture(BufferedImage texture) : void
+    + getPosition() : Position
+    + setPosition(Position position) : void
+}
+
+class Score {
+    - nickname : String
+    - score : int
+
+    + Score(String nickname, int score)
+
+    + getScore() : int
+    + getNickname() : String
+
+}
+class MyComparator implements Comparator {
+        + compare(Score o1, Score o2) : int
+    }
+
+class Position {
+    - x : int
+    - y : int
+
+    + Position(int x, int y)
+    + Position()
+    + Position(Position position)
+
+    + move(int x, int y): void 
+    + move(Position pos) : void 
+    + getY() : int 
+    + getX() : int 
+    + setX(int x) : void 
+    + setY(int y) : void 
+    + set(Position n) : void 
+    + set(int x, int y) : void 
+    + equals(Position pos) : boolean
+}
+
+abstract class Food {
+    - texture : BufferedImage 
+    - position : Position 
+
+    # Food(BufferedImage texture)
+    + getTexture() : BufferedImage
+    + setTexture(BufferedImage texture) : void
+    + getPosition() : Position
+    + setPosition(Position position) : void
+    + setRandomPosition() : void
+    + checkCollision(SnakeElement s) : boolean
+    + //eat() : int//
+}
+
+class FoodGood{
+    + FoodGood()
+
+    + eat() : int
+}
+
+class FoodBad{
+    + FoodBad()
+
+    + eat() : int
+}
+
+class ScreenDisplay extends JPanel implements KeyListener {
+
+    - <u> INSTANCE : ScreenDisplay()
+    - currentScreen : Screen
+
+    - ScreenDisplay()
+
+    + <u> getInstance(): ScreenDisplay
+    + setScreen(Screen screen) : void
+    + keyTyped(KeyEvent e) : void
+    + keyPressed(KeyEvent e) : void
+    + keyReleased(KeyEvent e) : void
+}
+
+abstract class Screen extends JPanel{
+    + keyTyped(KeyEvent e) : void 
+    + keyPressed(KeyEvent e) : void 
+    + keyReleased(KeyEvent e) : void 
+}
+
+class GameScreen extends Screen {
+    - snake : Snake 
+    - score : int 
+    - foodList:ArrayList<GameObjects.Food>
+
+    + GameScreen()
+
+    # void paintComponent(Graphics g):
+    # paint(Graphics2D g): void 
+    - paintSnake(Graphics2D g): void 
+    + update() : void 
+    + endGame() : void 
+    + keyTyped(KeyEvent e): void 
+    + keyPressed(KeyEvent e): void 
+    + keyReleased(KeyEvent e): void 
+}
+
+class HighScoreScreen extends Screen {
+    - highScores : ArrayList<Score>
+
+    + HighScoreScreen()
+
+    # paintComponent(Graphics g) : void
+    # paint(Graphics2D g) : void
+    + keyTyped(KeyEvent e) : void
+    + keyPressed(KeyEvent e) : void
+    + keyReleased(KeyEvent e) : void
+}
+
+class MenuScreen extends Screen {
+    - BUTTONS : String [] 
+    - selectedButton : int
+
+    + MenuScreen()
+
+    # paintComponent(Graphics g) : void 
+    # paint(Graphics2D g) : void 
+    + keyTyped(KeyEvent e) : void 
+    + keyPressed(KeyEvent e) : void 
+    + keyReleased(KeyEvent e) : void 
+    + enterFun() : void 
+    + startFun() : void 
+    + highScoreFun() : void 
+    + exitFun() : void 
+}
+
+class ScoreInputScreen extends Screen {
+
+    - SCORE : int
+    - nickname : String
+    - highScores : ArrayList<Score> 
+    
+    + ScoreInputScreen(int score)
+
+    # paintComponent(Graphics g) : void 
+    # paint(Graphics2D g) : void 
+    + keyTyped(KeyEvent e) : void 
+    + keyPressed(KeyEvent e) : void 
+    + keyReleased(KeyEvent e) : void 
+    - saveToFile() : void
+}
+
+class Utills {
+    - Font font;
+    - Font font2;
+    - <u>INSTANCE : Utills
+    - BufferedImage foodGoodTexture,foodBadTexture;
+    - BufferedImage background;
+    - BufferedImage snakeHeadUp;
+    - BufferedImage snakeHeadDown;
+    - BufferedImage snakeHeadLeft;
+    - BufferedImage snakeHeadRight;
+    - BufferedImage snakeBody;
+    + String SCORE_FILE_NAME;
+    - Color SELECTEDTEXTCOLOR : Color
+    - Color UNSELECTEDTEXTCOLOR : Color
+
+    - Utills()
+    + <u> getInstance() : Utills
+
+    + getFoodGoodTexture() : BufferedImage
+    + getFoodBadTexture() : BufferedImage
+    + getSnakeHeadUp() : BufferedImage
+    + getSnakeHeadDown() : BufferedImage
+    + getSnakeHeadLeft() : BufferedImage
+    + getSnakeHeadRight() : BufferedImage
+    + getSnakeBody() : BufferedImage
+    + getBackground() : BufferedImage
+    + getScoreFileName() : String
+    + getSelectedTextColor() : Color
+    + getUnselectedTextColor() : Color
+    + drawCenteredString(Graphics g, String text, FontMetrics fontMetrics,int y, int width) : void
+    + getFont() : Font
+    + getFont2() : Font
+}
+
+Utills <-- GameScreen
+Utills <-- HighScoreScreen
+Utills <-- MenuScreen
+Utills <-- ScoreInputScreen
+Utills <-- Snake
+Utills <-- FoodBad
+Utills <-- FoodGood
+
+ScreenDisplay *--> Screen
+ScreenDisplay --* MenuScreen
+ScreenDisplay -up-> App
+
+GameScreen --> Snake
+GameScreen --> SnakeElement
+GameScreen --> Food
+
+
+HighScoreScreen --> Score
+ScoreInputScreen --> Score
+
+Food <|-down- FoodGood
+Food <|-down- FoodBad
+
+Position <-up-- Snake
+Position <-up-- SnakeElement
+Position <-up-- Food
+
+ScreenDisplay <-- ScreenDisplay
+Utills <-- Utills
+
+Score o-- MyComparator
+
+
+@enduml
+
+
+
+
+
+
+
+
+
+
+
+
+

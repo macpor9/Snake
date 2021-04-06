@@ -1,0 +1,30 @@
+@startuml
+
+skinparam monochrome true
+skinparam linetype ortho
+skinparam shadowing false
+skinparam sequence {
+LifeLineBackgroundColor #DarkSalmon
+}
+
+Actor -> ScoreInputScreen : saveToFile
+activate ScoreInputScreen
+    ScoreInputScreen -> Score : <<createScore>>
+    activate Score
+        Score --> ScoreInputScreen
+    deactivate Score
+
+    ScoreInputScreen -> HighScoreScreen : <<createHighScoreScreen>>
+    activate HighScoreScreen
+        HighScoreScreen -> Score : <<createScore>>
+        activate Score
+            Score --> HighScoreScreen
+        deactivate Score
+        HighScoreScreen --> ScoreInputScreen
+    deactivate HighScoreScreen
+    ScoreInputScreen --> Actor : savedToFile
+
+deactivate ScoreInputScreen
+
+
+@enduml

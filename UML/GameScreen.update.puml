@@ -1,0 +1,86 @@
+@startuml
+
+skinparam monochrome true
+skinparam linetype ortho
+skinparam shadowing false
+skinparam sequence {
+LifeLineBackgroundColor #DarkSalmon
+}
+
+Actor -> GameScreen : update
+activate GameScreen
+        GameScreen -> Snake : move
+        activate Snake
+        Snake -> Position : <<createPosition>>
+            activate Position
+                Position -> Position : <<createPosition>>
+                Position -> Position : set Position
+                Position --> Snake :
+            deactivate Position
+
+            Snake -> Position : move
+
+            activate Position
+                Position -> Position : move
+                Position --> Snake
+            deactivate Position
+            Snake --> GameScreen
+        deactivate Snake
+
+    GameScreen -> Food : checkCollision
+        activate Food
+            Food -> Position : equals
+            activate Position
+                Position --> Food
+            deactivate Position
+            Food --> GameScreen
+        deactivate Food
+    GameScreen -> Food : eat
+    activate Food
+        Food --> GameScreen
+    deactivate Food
+    GameScreen -> Position : equals
+    activate Position
+        Position --> GameScreen
+    deactivate Position
+
+        opt score<0 case
+        GameScreen -> GameScreen : endGame
+            GameScreen -> ScoreInputScreen : <<createScoreInputScreen>>
+        activate ScoreInputScreen
+            ScoreInputScreen -> Score : <<createScore>>
+            activate Score
+                Score --> ScoreInputScreen
+            deactivate Score
+            ScoreInputScreen --> GameScreen
+        deactivate ScoreInputScreen
+        end
+
+    opt snake.body.size()-1>score
+        GameScreen -> Snake : removeLast
+        activate Snake
+            Snake --> GameScreen
+        deactivate Snake
+    end
+
+    opt snake.body.size()-1<score
+    GameScreen -> Snake : addBody
+    activate Snake
+        Snake -> Position : <<createPosition>>
+        activate Position
+            Position -> Position : set Position
+            Position --> Snake
+        deactivate Position
+        Snake -> SnakeElement : <<createSnakeElement>>
+        activate SnakeElement
+        SnakeElement --> Snake
+        deactivate SnakeElement
+        Snake --> GameScreen
+    deactivate Snake
+    end
+
+GameScreen --> Actor : updated
+deactivate GameScreen
+
+
+@enduml
